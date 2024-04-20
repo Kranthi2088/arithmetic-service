@@ -3,21 +3,32 @@ on: push
 jobs:
   build_and_publish:
     runs-on: ubuntu-latest
+    env:
+      VERSION : ${{ github.sha }}
+      CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+      CONTAINER_REGISTRY_UN: ${{ secrets.CONTAINER_REGISTRY_UN }}
+      CONTAINER_REGISTRY_PW: ${{ secrets.CONTAINER_REGISTRY_PW }}
+
     steps:
       - uses: actions/checkout@v3
       - name: npm install
         run: npm ci
       - name: run the unit tests
         run: npm test
-      - name: Build and push the image
+      - name: Publish the image  to github container registry
         run: |
           docker login --username kranthi2088 --password ${{secrets.ACCESS_TOKEN}} ghcr.io
           docker build -t ghcr.io/kranthi2088/arithmetic-service:latest --file Dockerfile .
-          docker push ghcr.io/kranthi2088/arithmetic-service:latest
+          docker push ghcr.io/kranthi2088/arithmetic-service:$VERSION
       - name: Publish the image to azure container registry
         run: |
-          docker login --username practicum16 --password ${{secrets.AZURE_CONTAINER_REGISTRY}} practicum16.azurecr.io
-          docker tag ghcr.io/kranthi2088/arithmetic-service:latest practicum16.azurecr.io/arithmetic-service:1
-          docker push practicum16.azurecr.io/arithmetic-service:1
-
+          docker login --username $CONTAINER_REGISTRY_UN --password $CONTAINER_REGISTRY_PW $CONTAINER_REGISTRY
+          docker tag ghcr.io/kranthi2088/arithmetic-service:$VERSION $CONTAINER_REGISTRY/arithmetic-service:$VERSION
+          docker push $CONTAINER_REGISTRY/arithmetic-service:$VERSION
+          
+      - uses: tale/kubectl-action@v1
+        with: 
+            base-kube-config: ${{ secrets.KUBE_CONFIG }}
+      - name: Deploy 
+        run: ./deploy.sh
 
