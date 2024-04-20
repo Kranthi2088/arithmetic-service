@@ -18,7 +18,7 @@ jobs:
       - name: Publish the image  to github container registry
         run: |
           docker login --username kranthi2088 --password ${{secrets.ACCESS_TOKEN}} ghcr.io
-          docker build -t ghcr.io/kranthi2088/arithmetic-service:latest --file Dockerfile .
+          docker build -t ghcr.io/kranthi2088/arithmetic-service:$VERSION --file Dockerfile .
           docker push ghcr.io/kranthi2088/arithmetic-service:$VERSION
       - name: Publish the image to azure container registry
         run: |
