@@ -23,7 +23,7 @@ jobs:
       - name: Publish the image to azure container registry
         run: |
           docker login --username $CONTAINER_REGISTRY_UN --password $CONTAINER_REGISTRY_PW $CONTAINER_REGISTRY
-          docker tag ghcr.io/kranthi2088/arithmetic-service:latest $CONTAINER_REGISTRY/arithmetic-service:$VERSION
+          docker tag ghcr.io/kranthi2088/arithmetic-service:$VERSION $CONTAINER_REGISTRY/arithmetic-service:$VERSION
           docker push $CONTAINER_REGISTRY/arithmetic-service:$VERSION
 
       - uses: tale/kubectl-action@v1
