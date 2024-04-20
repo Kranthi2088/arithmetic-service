@@ -30,7 +30,7 @@ jobs:
         with: 
             base64-kube-config: ${{ secrets.KUBE_CONFIG }}
       - name: Deploy 
-        run: ./deploy.sh
+        run: chmod +x ./deploy.sh
 
 
 
